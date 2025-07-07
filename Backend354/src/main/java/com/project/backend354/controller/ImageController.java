@@ -38,7 +38,7 @@ class ImageController {
         if (file.isEmpty()) {
             return ResponseEntity
                     .badRequest()
-                    .body("File is empty");
+                    .body("File is empty.");
         }
 
         if (!file.getContentType().startsWith("image/")) {
