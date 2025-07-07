@@ -24,8 +24,8 @@ public class TestController {
     @PostMapping("/resize")
     public ResponseEntity<byte[]> resizeImage(
             @RequestParam("file") MultipartFile file,
-            @RequestParam(defaultValue = "128") int width,
-            @RequestParam(defaultValue = "128") int height
+            @RequestParam int width,
+            @RequestParam int height
     ) throws IOException, InterruptedException {
 
         Path inputFile = Files.createTempFile("input-", "-" + file.getOriginalFilename());
