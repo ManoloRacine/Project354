@@ -41,6 +41,11 @@ class ImageSessionListener implements HttpSessionListener {
         String sessionId = event.getSession().getId();
         Path sessionDir = Paths.get(uploadRoot, sessionId);
 
+        if (!Files.exists(sessionDir)) {
+            log.warn("Session directory does not exist: {}", sessionDir);
+            return;
+        }
+
         try {
             FileSystemUtils.deleteRecursively(sessionDir);
             log.info("Deleted session directory: {}", sessionDir);
