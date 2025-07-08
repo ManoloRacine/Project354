@@ -15,11 +15,18 @@ import java.nio.file.StandardCopyOption;
 public class ImageStorageService {
     private static final Logger log = LoggerFactory.getLogger(ImageStorageService.class);
 
-    public String save(Path sessionDir, MultipartFile file) throws IOException {
-        String fileName = Paths.get(file.getOriginalFilename()).getFileName().toString();
+    public Path save(Path sessionDir, MultipartFile file) throws IOException {
+        String fileName = Paths.get(file.getOriginalFilename())
+                .getFileName()
+                .toString();
+
         Path target = sessionDir.resolve(fileName);
-        Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
-        log.debug("Saved file to: {}", target);
-        return target.toString();
+
+        Files.copy(file.getInputStream(),
+                target,
+                StandardCopyOption.REPLACE_EXISTING);
+
+        log.info("Saved image to {}", target);
+        return target;
     }
 }
