@@ -1,5 +1,6 @@
 package com.project.backend354.service;
 
+import com.project.backend354.config.SessionDirectoryProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,12 +16,21 @@ import java.nio.file.StandardCopyOption;
 public class ImageStorageService {
     private static final Logger log = LoggerFactory.getLogger(ImageStorageService.class);
 
-    public Path save(Path sessionDir, MultipartFile file) throws IOException {
-        String fileName = Paths.get(file.getOriginalFilename())
+    private final SessionDirectoryProvider dirProvider;
+
+    public ImageStorageService(SessionDirectoryProvider dirProvider) {
+       this.dirProvider = dirProvider;
+    }
+
+    public Path save(MultipartFile file) throws IOException {
+        Path targetDir = dirProvider.getDirectory();
+
+        String fileName = Paths
+                .get(file.getOriginalFilename())
                 .getFileName()
                 .toString();
 
-        Path target = sessionDir.resolve(fileName);
+        Path target = targetDir.resolve(fileName);
 
         Files.copy(file.getInputStream(),
                 target,

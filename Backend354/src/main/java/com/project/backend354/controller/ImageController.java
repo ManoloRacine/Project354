@@ -1,6 +1,6 @@
 package com.project.backend354.controller;
 
-import com.project.backend354.config.SessionUploadDirectory;
+import com.project.backend354.config.SessionDirectoryProvider;
 import com.project.backend354.service.ImageStorageService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +17,9 @@ import java.nio.file.Path;
 @RequestMapping("/api/images")
 public class ImageController {
     private final ImageStorageService storageService;
-    private final SessionUploadDirectory sessionDir;
 
-    public ImageController(ImageStorageService storageService,
-                           SessionUploadDirectory sessionDir) {
+    public ImageController(ImageStorageService storageService) {
         this.storageService = storageService;
-        this.sessionDir    = sessionDir;
     }
 
     @PostMapping(value = "/upload",
@@ -40,7 +37,8 @@ public class ImageController {
                     .body("Only image files are allowed.");
         }
 
-        Path saved = storageService.save(sessionDir.getDirectory(), file);
+        Path saved = storageService.save(file);
+
         return ResponseEntity.ok("Uploaded to: " + saved);
     }
 }
