@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,9 +33,12 @@ public class ImageStorageService {
 
         Path target = targetDir.resolve(fileName);
 
-        Files.copy(file.getInputStream(),
-                target,
-                StandardCopyOption.REPLACE_EXISTING);
+        try (InputStream in = file.getInputStream()) {
+            Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            log.error("Failed to save image to: {}", target, e);
+            throw e;
+        }
 
         log.info("Saved image to {}", target);
         return target;
