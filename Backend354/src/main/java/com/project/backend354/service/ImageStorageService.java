@@ -19,7 +19,7 @@ public class ImageStorageService {
     private final SessionDirectoryProvider dirProvider;
 
     public ImageStorageService(SessionDirectoryProvider dirProvider) {
-       this.dirProvider = dirProvider;
+        this.dirProvider = dirProvider;
     }
 
     public Path save(MultipartFile file) throws IOException {
