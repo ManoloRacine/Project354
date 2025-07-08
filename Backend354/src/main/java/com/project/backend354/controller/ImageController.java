@@ -1,6 +1,6 @@
 package com.project.backend354.controller;
 
-import com.project.backend354.service.ImageService;
+import com.project.backend354.service.ImageStorageService;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,18 +17,18 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 @RestController
-@RequestMapping("/api/upload")
+@RequestMapping("/api/images")
 class ImageController {
 
     private static final Logger log = LoggerFactory.getLogger(ImageController.class);
-    private final ImageService imageService;
+    private final ImageStorageService storageService;
 
-    ImageController(ImageService imageUploadService) {
-        this.imageService = imageUploadService;
+    ImageController(ImageStorageService imageUploadService) {
+        this.storageService = imageUploadService;
     }
 
     @PostMapping(
-            value = "/image",
+            value = "/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<?> uploadImage(
@@ -56,7 +56,7 @@ class ImageController {
                     .body("Session not initialized properly.");
         }
 
-        String savedPath = imageService.upload(sessionDir, file);
+        String savedPath = storageService.save(sessionDir, file);
         log.info("File uploaded to: {}", savedPath);
         return ResponseEntity.ok("Uploaded to: " + savedPath);
     }

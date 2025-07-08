@@ -12,10 +12,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 @Service
-public class ImageService {
-    private static final Logger log = LoggerFactory.getLogger(ImageService.class);
+public class ImageStorageService {
+    private static final Logger log = LoggerFactory.getLogger(ImageStorageService.class);
 
-    public String upload(Path sessionDir, MultipartFile file) throws IOException {
+    public String save(Path sessionDir, MultipartFile file) throws IOException {
         String fileName = Paths.get(file.getOriginalFilename()).getFileName().toString();
         Path target = sessionDir.resolve(fileName);
         Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
