@@ -1,6 +1,7 @@
 package com.project.backend354.service;
 
 import com.project.backend354.config.SessionDirectoryProvider;
+import com.project.backend354.exception.FileStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 @Service
@@ -23,24 +23,18 @@ public class ImageStorageService {
         this.dirProvider = dirProvider;
     }
 
-    public Path save(MultipartFile file) throws IOException {
+    public Path save(MultipartFile file) {
         Path targetDir = dirProvider.getDirectory();
+        String originalFilename = file.getOriginalFilename();
+        Path target = targetDir.resolve(originalFilename);
 
-        String fileName = Paths
-                .get(file.getOriginalFilename())
-                .getFileName()
-                .toString();
-
-        Path target = targetDir.resolve(fileName);
-
-        try (InputStream in = file.getInputStream()) {
-            Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
+            log.info("Successfully saved image to {}", target);
+            return target;
         } catch (IOException e) {
             log.error("Failed to save image to: {}", target, e);
-            throw e;
+            throw new FileStorageException("Failed to save image file", e);
         }
-
-        log.info("Saved image to {}", target);
-        return target;
     }
 }
