@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 @Component
 @SessionScope
@@ -24,11 +25,17 @@ public class SessionDirectoryProvider {
 
     public SessionDirectoryProvider(
             @Value("${upload.base-dir}") String uploadRoot,
-            HttpSession session) throws IOException {
+            HttpSession session) {
+        String uniqueFolder = UUID.randomUUID().toString();
+        this.sessionDir = Paths.get(uploadRoot, session.getId(), uniqueFolder);
 
-        this.sessionDir = Paths.get(uploadRoot, session.getId());
-        Files.createDirectories(sessionDir);
-        log.info("Session upload dir created: {}", sessionDir);
+        try {
+            Files.createDirectories(sessionDir);
+            log.info("Session upload dir created: {}", sessionDir);
+        } catch (IOException e) {
+            log.error("Failed to create session upload directory: {}", sessionDir, e);
+            throw new IllegalStateException("Could not create upload directory", e);
+        }
     }
 
     public Path getDirectory() {
