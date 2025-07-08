@@ -1,8 +1,13 @@
 package com.project.backend354.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 public class ErrorResponse {
     private String error;
     private String message;
@@ -16,14 +21,4 @@ public class ErrorResponse {
         this.status = status;
         this.timestamp = LocalDateTime.now();
     }
-
-    // Getters and setters
-    public String getError() { return error; }
-    public void setError(String error) { this.error = error; }
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
-    public int getStatus() { return status; }
-    public void setStatus(int status) { this.status = status; }
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 }

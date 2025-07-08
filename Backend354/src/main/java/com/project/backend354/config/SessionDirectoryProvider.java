@@ -25,12 +25,10 @@ public class SessionDirectoryProvider {
 
     private final Path sessionDir;
 
-    public SessionDirectoryProvider(
-            @Value("${upload.base-dir}") String uploadRoot,
-            HttpSession session) {
+    public SessionDirectoryProvider(@Value("${upload.base-dir}") String uploadRoot, HttpSession session) {
 
         if (!StringUtils.hasText(uploadRoot)) {
-            throw new FileStorageException("Upload base directory not configured", null);
+            throw new FileStorageException("Upload base directory not configured");
         }
 
         String uniqueFolder = UUID.randomUUID().toString();
@@ -51,7 +49,7 @@ public class SessionDirectoryProvider {
     public Path getDirectory() {
         if (!Files.exists(sessionDir)) {
             log.warn("Session directory no longer exists: {}", sessionDir);
-            throw new FileStorageException("Session directory has been removed", null);
+            throw new FileStorageException("Session directory has been removed");
         }
         return sessionDir;
     }

@@ -10,12 +10,11 @@ import java.util.Set;
 @Component
 public class FileValidator {
 
+    private static final Set<String> ALLOWED_TYPES
+            = Set.of("image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp");
+
     @Value("${upload.max-file-size:5242880}") // 5MB default
     private long maxFileSize;
-
-    private static final Set<String> ALLOWED_TYPES = Set.of(
-            "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"
-    );
 
     public void validateImage(MultipartFile file) {
         if (file.isEmpty()) {
