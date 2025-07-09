@@ -28,10 +28,10 @@ public class ImageStorageService {
         try (InputStream inputStream = file.getInputStream()) {
             Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
             log.info("Successfully saved image to {}", target);
-            return target;
         } catch (IOException e) {
-            log.error("Failed to save image to: {}", target, e);
             throw new FileStorageException("Failed to save image file", e);
         }
+
+        return target;
     }
 }
