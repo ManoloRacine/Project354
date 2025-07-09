@@ -3,8 +3,7 @@ package com.project.backend354.config;
 import com.project.backend354.exception.FileStorageException;
 import jakarta.annotation.PreDestroy;
 import jakarta.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileSystemUtils;
@@ -19,9 +18,8 @@ import java.util.UUID;
 
 @Component
 @SessionScope
+@Slf4j
 public class SessionDirectoryProvider {
-
-    private static final Logger log = LoggerFactory.getLogger(SessionDirectoryProvider.class);
 
     private final Path sessionDir;
 
@@ -38,17 +36,14 @@ public class SessionDirectoryProvider {
             Files.createDirectories(sessionDir);
             log.info("Session upload dir created: {}", sessionDir);
         } catch (IOException e) {
-            log.error("Failed to create session upload directory: {}", sessionDir, e);
             throw new FileStorageException("Could not create upload directory: " + sessionDir, e);
         } catch (SecurityException e) {
-            log.error("Permission denied creating directory: {}", sessionDir, e);
             throw new FileStorageException("Permission denied creating upload directory", e);
         }
     }
 
     public Path getDirectory() {
         if (!Files.exists(sessionDir)) {
-            log.warn("Session directory no longer exists: {}", sessionDir);
             throw new FileStorageException("Session directory has been removed");
         }
         return sessionDir;
@@ -65,7 +60,7 @@ public class SessionDirectoryProvider {
             FileSystemUtils.deleteRecursively(sessionDir);
             log.info("Session upload dir deleted: {}", sessionDir);
         } catch (IOException e) {
-            log.error("Failed to delete session dir: {}", sessionDir, e);
+            throw new FileStorageException("Failed to delete session dir: " + sessionDir, e);
         }
     }
 }

@@ -9,10 +9,11 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class ErrorResponse {
+public class ImageUploadResponse {
 
-    private String error;
     private String message;
+    private String filename;
+    private String path;
 
     @JsonFormat(pattern = AppConstants.TIMESTAMP_PATTERN)
     @Builder.Default
