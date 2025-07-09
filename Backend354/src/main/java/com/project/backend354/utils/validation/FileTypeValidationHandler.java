@@ -12,7 +12,7 @@ public class FileTypeValidationHandler extends FileValidationHandler {
             MediaType.IMAGE_JPEG_VALUE,
             MediaType.IMAGE_PNG_VALUE,
             MediaType.IMAGE_GIF_VALUE,
-            "image/webp"
+            "image/webp" // MediaType doesn't include WebP by default
     );
 
     @Override
