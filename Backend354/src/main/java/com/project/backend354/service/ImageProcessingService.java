@@ -5,7 +5,6 @@ import com.project.backend354.command.factory.ImageOperationFactory;
 import com.project.backend354.config.SessionDirectoryProvider;
 import com.project.backend354.exception.FileNotFoundException;
 import com.project.backend354.exception.ImageProcessingException;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -25,7 +24,6 @@ public class ImageProcessingService {
 
     private final ImageOperationFactory operationFactory;
     private final SessionDirectoryProvider dirProvider;
-    @Getter
     private String lastProcessedFile;
 
     public String processImage(String filename, List<Map<String, Object>> operations) {
@@ -51,6 +49,13 @@ public class ImageProcessingService {
             cleanupOutputFile(outputPath);
             throw new ImageProcessingException("Failed to apply operations", e);
         }
+    }
+
+    public String getLastProcessedFile() {
+        if (lastProcessedFile == null) {
+            throw new FileNotFoundException("No file has been processed yet");
+        }
+        return lastProcessedFile;
     }
 
     private void validateOperations(List<Map<String, Object>> operations) {

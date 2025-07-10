@@ -1,6 +1,7 @@
 package com.project.backend354.service;
 
 import com.project.backend354.config.SessionDirectoryProvider;
+import com.project.backend354.exception.FileNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
@@ -24,7 +25,7 @@ public class FileDownloadService {
         Path filePath = sessionDir.resolve(filename);
 
         if (!Files.exists(filePath)) {
-            return null;
+            throw new FileNotFoundException("File not found: " + filename);
         }
 
         return new FileSystemResource(filePath.toFile());

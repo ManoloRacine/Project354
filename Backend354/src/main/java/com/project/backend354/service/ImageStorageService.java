@@ -1,6 +1,7 @@
 package com.project.backend354.service;
 
 import com.project.backend354.config.SessionDirectoryProvider;
+import com.project.backend354.exception.FileNotFoundException;
 import com.project.backend354.exception.FileStorageException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,6 @@ import java.nio.file.StandardCopyOption;
 public class ImageStorageService {
 
     private final SessionDirectoryProvider dirProvider;
-    @Getter
     private String lastUploadedFile;
 
     public Path save(MultipartFile file) {
@@ -37,5 +37,12 @@ public class ImageStorageService {
         }
 
         return target;
+    }
+
+    public String getLastUploadedFile() {
+        if (lastUploadedFile == null) {
+            throw new FileNotFoundException("No file has been uploaded yet");
+        }
+        return lastUploadedFile;
     }
 }

@@ -48,17 +48,7 @@ public class ImageController {
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadLatestImage() {
         String filename = processingService.getLastProcessedFile();
-
-        if (filename == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         Resource resource = downloadService.getFileResource(filename);
-
-        if (resource == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         String contentType = downloadService.getContentType(filename);
 
         return ResponseEntity.ok()
@@ -72,11 +62,6 @@ public class ImageController {
             @RequestBody List<Map<String, Object>> operations) {
 
         String inputFilename = storageService.getLastUploadedFile();
-
-        if (inputFilename == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
         String outputFilename = processingService.processImage(inputFilename, operations);
 
         return ResponseEntity.ok(ImageUploadResponse.builder()
