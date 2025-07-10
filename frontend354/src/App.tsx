@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 // 1. Import the new component
 import ImageUploadComponent from './ImageUploadComponent';
+import ImageProcessingComponent from "./ImageProcessingComponent.tsx";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -77,19 +78,24 @@ function App() {
                 <img src={imagePreview} alt="Selected preview" className="image-preview" />
                 <p>File Name: {selectedImage.name}</p>
                 
-                {/* button to trigger the upload */}
-                <button onClick={handleUpload}>Upload to Server</button>
 
-                {/*  display the server's response */}
-                {uploadResponse && <p>{uploadResponse}</p>}
             </div>
         )}
 
       {/* --- end of image file upload component --- */}
 
+        {/*
+        2. Render the new processing component.
+        We only show it if an image has been selected, and we pass the
+        selectedImage file down to it as a prop.
+      */}
+        {selectedImage && <ImageProcessingComponent selectedImage={selectedImage} />}
 
 
-      <div className="card">
+
+
+
+        <div className="card">
         <button onClick={() => fetch('http://localhost:8080/test')}>
           Press this button to call the backend
         </button>
