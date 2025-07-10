@@ -12,28 +12,20 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(FileValidationException.class)
-    public ResponseEntity<ErrorResponse> handleFileValidation(FileValidationException ex) {
-        log.warn("File validation failed: {}", ex.getMessage());
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ErrorResponse> handleBaseException(BaseException ex) {
+        if (ex.getHttpStatus().is4xxClientError()) {
+            log.warn("Client error: {}", ex.getMessage());
+        } else {
+            log.error("Server error", ex);
+        }
 
         ErrorResponse error = ErrorResponse.builder()
-                .error("VALIDATION_ERROR")
+                .error(ex.getErrorCode())
                 .message(ex.getMessage())
                 .build();
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-    }
-
-    @ExceptionHandler(FileStorageException.class)
-    public ResponseEntity<ErrorResponse> handleFileStorage(FileStorageException ex) {
-        log.error("File storage failed", ex);
-
-        ErrorResponse error = ErrorResponse.builder()
-                .error("STORAGE_ERROR")
-                .message(ex.getMessage())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        return ResponseEntity.status(ex.getHttpStatus()).body(error);
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
