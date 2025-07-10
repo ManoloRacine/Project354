@@ -1,4 +1,5 @@
 package com.project.backend354;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +28,37 @@ public class TestController {
             @RequestParam int width,
             @RequestParam int height
     ) throws IOException, InterruptedException {
+        return processImageWithCommand(file, List.of(
+                "-resize", width + "x" + height
+        ), "resized");
+    }
+
+    @PostMapping("/rotate")
+    public ResponseEntity<byte[]> rotateImage(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam double angle
+    ) throws IOException, InterruptedException {
+        return processImageWithCommand(file, List.of(
+                "-rotate", String.valueOf(angle)
+        ), "rotated");
+    }
+
+    @PostMapping("/crop")
+    public ResponseEntity<byte[]> cropImage(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam int width,
+            @RequestParam int height,
+            @RequestParam int x,
+            @RequestParam int y
+    ) throws IOException, InterruptedException {
+        return processImageWithCommand(file, List.of(
+                "-crop", width + "x" + height + "+" + x + "+" + y,
+                "+repage"
+        ), "cropped");
+    }
+
+    private ResponseEntity<byte[]> processImageWithCommand(MultipartFile file, List<String> magickOptions, String outputName)
+            throws IOException, InterruptedException {
 
         Path inputFile = Files.createTempFile("input-", "-" + file.getOriginalFilename());
         Files.write(inputFile, file.getBytes());
@@ -37,12 +69,11 @@ public class TestController {
         }
         Path outputFile = Files.createTempFile("output-", "." + extension);
 
-        List<String> command = List.of(
-                "magick",
-                inputFile.toAbsolutePath().toString(),
-                "-resize", width + "x" + height,
-                outputFile.toAbsolutePath().toString()
-        );
+        List<String> command = new java.util.ArrayList<>();
+        command.add("magick");
+        command.add(inputFile.toAbsolutePath().toString());
+        command.addAll(magickOptions);
+        command.add(outputFile.toAbsolutePath().toString());
 
         ProcessBuilder pb = new ProcessBuilder(command);
         pb.redirectErrorStream(true);
@@ -59,17 +90,17 @@ public class TestController {
 
         int exitCode = process.waitFor();
         if (exitCode != 0) {
-            throw new RuntimeException("ImageMagick resize failed with exit code " + exitCode);
+            throw new RuntimeException("ImageMagick operation failed with exit code " + exitCode);
         }
 
-        byte[] resizedImage = Files.readAllBytes(outputFile);
+        byte[] processedImage = Files.readAllBytes(outputFile);
         Files.deleteIfExists(inputFile);
         Files.deleteIfExists(outputFile);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"resized." + extension + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + outputName + "." + extension + "\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resizedImage);
+                .body(processedImage);
     }
 
     private String getFileExtension(String filename) {
