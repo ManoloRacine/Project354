@@ -45,8 +45,14 @@ public class ImageController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/download/{filename}")
-    public ResponseEntity<Resource> downloadImage(@PathVariable String filename) {
+    @GetMapping("/download")
+    public ResponseEntity<Resource> downloadLatestImage() {
+        String filename = processingService.getLastProcessedFile();
+
+        if (filename == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         Resource resource = downloadService.getFileResource(filename);
 
         if (resource == null) {
@@ -63,10 +69,15 @@ public class ImageController {
 
     @PostMapping("/apply")
     public ResponseEntity<ImageUploadResponse> applyOperations(
-            @RequestParam String filename,
             @RequestBody List<Map<String, Object>> operations) {
 
-        String outputFilename = processingService.processImage(filename, operations);
+        String inputFilename = storageService.getLastUploadedFile();
+
+        if (inputFilename == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        String outputFilename = processingService.processImage(inputFilename, operations);
 
         return ResponseEntity.ok(ImageUploadResponse.builder()
                 .message("Operations applied successfully")
