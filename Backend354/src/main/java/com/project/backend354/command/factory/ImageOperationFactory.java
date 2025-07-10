@@ -52,19 +52,35 @@ public class ImageOperationFactory {
     public ResizeOperation createResizeOperation(String inputPath, String outputPath, int width, int height) {
         validatePaths(inputPath, outputPath);
         validateDimensions(width, height);
-        return new ResizeOperation(inputPath, outputPath, width, height);
+        return ResizeOperation.builder()
+                .inputPath(inputPath)
+                .outputPath(outputPath)
+                .width(width)
+                .height(height)
+                .build();
     }
 
     public CropOperation createCropOperation(String inputPath, String outputPath, int width, int height, int x, int y) {
         validatePaths(inputPath, outputPath);
         validateDimensions(width, height);
         validateCoordinates(x, y);
-        return new CropOperation(inputPath, outputPath, width, height, x, y);
+        return CropOperation.builder()
+                .inputPath(inputPath)
+                .outputPath(outputPath)
+                .width(width)
+                .height(height)
+                .x(x)
+                .y(y)
+                .build();
     }
 
     public RotateOperation createRotateOperation(String inputPath, String outputPath, double angle) {
         validatePaths(inputPath, outputPath);
-        return new RotateOperation(inputPath, outputPath, angle);
+        return RotateOperation.builder()
+                .inputPath(inputPath)
+                .outputPath(outputPath)
+                .angle(angle)
+                .build();
     }
 
     public FlipOperation createFlipOperation(String inputPath, String outputPath, boolean horizontal, boolean vertical) {
@@ -72,7 +88,12 @@ public class ImageOperationFactory {
         if (!horizontal && !vertical) {
             throw new ImageProcessingException("At least one flip direction must be specified");
         }
-        return new FlipOperation(inputPath, outputPath, horizontal, vertical);
+        return FlipOperation.builder()
+                .inputPath(inputPath)
+                .outputPath(outputPath)
+                .horizontal(horizontal)
+                .vertical(vertical)
+                .build();
     }
 
     public QualityOperation createQualityOperation(String inputPath, String outputPath, int quality) {
@@ -80,7 +101,11 @@ public class ImageOperationFactory {
         if (quality < 1 || quality > 100) {
             throw new ImageProcessingException("Quality must be between 1 and 100");
         }
-        return new QualityOperation(inputPath, outputPath, quality);
+        return QualityOperation.builder()
+                .inputPath(inputPath)
+                .outputPath(outputPath)
+                .quality(quality)
+                .build();
     }
 
     public BrightnessContrastOperation createBrightnessContrastOperation(String inputPath, String outputPath, int brightness, int contrast) {
@@ -91,7 +116,12 @@ public class ImageOperationFactory {
         if (contrast < -100 || contrast > 100) {
             throw new ImageProcessingException("Contrast must be between -100 and 100");
         }
-        return new BrightnessContrastOperation(inputPath, outputPath, brightness, contrast);
+        return BrightnessContrastOperation.builder()
+                .inputPath(inputPath)
+                .outputPath(outputPath)
+                .brightness(brightness)
+                .contrast(contrast)
+                .build();
     }
 
     public FormatConvertOperation createFormatConvertOperation(String inputPath, String outputPath, String format) {
@@ -99,7 +129,11 @@ public class ImageOperationFactory {
         if (format == null || format.trim().isEmpty()) {
             throw new ImageProcessingException("Format cannot be empty");
         }
-        return new FormatConvertOperation(inputPath, outputPath, format);
+        return FormatConvertOperation.builder()
+                .inputPath(inputPath)
+                .outputPath(outputPath)
+                .format(format)
+                .build();
     }
 
     private void validatePaths(String inputPath, String outputPath) {

@@ -1,7 +1,9 @@
 package com.project.backend354.command;
 
 import com.project.backend354.exception.ImageProcessingException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -12,7 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-@RequiredArgsConstructor
+@Getter
+@SuperBuilder
 public abstract class ImageOperation {
     protected final String inputPath;
     protected final String outputPath;

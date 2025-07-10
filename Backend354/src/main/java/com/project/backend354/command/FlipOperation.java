@@ -1,17 +1,13 @@
 package com.project.backend354.command;
 
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
+@SuperBuilder
 public class FlipOperation extends ImageOperation {
     private final boolean horizontal;
     private final boolean vertical;
-
-    public FlipOperation(String inputPath, String outputPath, boolean horizontal, boolean vertical) {
-        super(inputPath, outputPath);
-        this.horizontal = horizontal;
-        this.vertical = vertical;
-    }
 
     @Override
     public String buildCommandPart() {

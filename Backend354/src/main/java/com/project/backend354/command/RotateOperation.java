@@ -1,15 +1,12 @@
 package com.project.backend354.command;
 
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
+@SuperBuilder
 public class RotateOperation extends ImageOperation {
     private final double angle;
-
-    public RotateOperation(String inputPath, String outputPath, double angle) {
-        super(inputPath, outputPath);
-        this.angle = angle;
-    }
 
     @Override
     public String buildCommandPart() {

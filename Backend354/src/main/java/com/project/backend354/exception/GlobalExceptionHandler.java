@@ -12,28 +12,20 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(FileValidationException.class)
-    public ResponseEntity<ErrorResponse> handleFileValidation(FileValidationException ex) {
-        log.warn("File validation failed: {}", ex.getMessage());
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ErrorResponse> handleBaseException(BaseException ex) {
+        if (ex.getHttpStatus().is4xxClientError()) {
+            log.warn("Client error: {}", ex.getMessage());
+        } else {
+            log.error("Server error", ex);
+        }
 
         ErrorResponse error = ErrorResponse.builder()
-                .error("VALIDATION_ERROR")
+                .error(ex.getErrorCode())
                 .message(ex.getMessage())
                 .build();
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-    }
-
-    @ExceptionHandler(FileStorageException.class)
-    public ResponseEntity<ErrorResponse> handleFileStorage(FileStorageException ex) {
-        log.error("File storage failed", ex);
-
-        ErrorResponse error = ErrorResponse.builder()
-                .error("STORAGE_ERROR")
-                .message(ex.getMessage())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        return ResponseEntity.status(ex.getHttpStatus()).body(error);
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
@@ -58,41 +50,5 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-    }
-
-    @ExceptionHandler(ImageProcessingException.class)
-    public ResponseEntity<ErrorResponse> handleImageProcessing(ImageProcessingException ex) {
-        log.error("Image processing failed", ex);
-
-        ErrorResponse error = ErrorResponse.builder()
-                .error("IMAGE_PROCESSING_ERROR")
-                .message(ex.getMessage())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-    }
-
-    @ExceptionHandler(FileNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleFileNotFound(FileNotFoundException ex) {
-        log.warn("File not found: {}", ex.getMessage());
-
-        ErrorResponse error = ErrorResponse.builder()
-                .error("FILE_NOT_FOUND")
-                .message(ex.getMessage())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
-        log.warn("Invalid argument: {}", ex.getMessage());
-
-        ErrorResponse error = ErrorResponse.builder()
-                .error("INVALID_ARGUMENT")
-                .message(ex.getMessage())
-                .build();
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }
