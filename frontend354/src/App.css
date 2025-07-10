@@ -40,3 +40,14 @@
 .read-the-docs {
   color: #888;
 }
+.image-preview-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.image-preview {
+  max-width: 300px;
+  max-height: 300px;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+}

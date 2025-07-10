@@ -15,7 +15,7 @@ FROM eclipse-temurin:24-alpine
 
 COPY --from=builder /app/target/*.jar /app/application.jar
 
-RUN apk add --no-cache imagemagick
+RUN apk add --no-cache imagemagick jpeg
 
 EXPOSE 8080
 
