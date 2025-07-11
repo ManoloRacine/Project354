@@ -108,32 +108,42 @@ function App() {
 
   const handleDownload = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/images/download', {
-        method: 'GET',
-        credentials: 'include',
-      });
+        const response = await fetch('http://localhost:8080/api/images/download', {
+            method: 'GET',
+            credentials: 'include',
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Download failed: ${response.status} ${errorText}`);
-      }
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Download failed: ${response.status} ${errorText}`);
+        }
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'processed_image.png';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
 
-      console.log('Download triggered successfully.');
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = 'processed_image';
+        if (contentDisposition) {
+            const match = contentDisposition.match(/filename="?([^"]+)"?/);
+            if (match && match[1]) {
+                filename = match[1];
+            }
+        }
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        console.log(`Download triggered successfully as ${filename}.`);
     } catch (error: any) {
-      console.error('Error downloading the image:', error);
-      setUploadResponse(`Error downloading: ${error.message}`);
+        console.error('Error downloading the image:', error);
+        setUploadResponse(`Error downloading: ${error.message}`);
     }
-  };
+};
 
   return (
     <div className="p-6 space-y-4">
