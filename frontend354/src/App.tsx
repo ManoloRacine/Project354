@@ -59,7 +59,7 @@ function App() {
       const response = await fetch('http://localhost:8080/api/images/upload', {
         method: 'POST',
         body: formData,
-        credentials: 'include', // Include session cookies
+        credentials: 'include',
       });
       const result = await response.json();
       if (!response.ok) {
@@ -80,7 +80,9 @@ function App() {
     if (quality) operations.push({ type: 'quality', quality: Number(qualityValue) });
     if (bc) operations.push({ type: 'brightness-contrast', brightness: Number(brightness), contrast: Number(contrast) });
     if (format) operations.push({ type: 'format', format: formatValue });
-    console.log(JSON.stringify(operations));
+
+    console.log('Sending operations:', JSON.stringify(operations));
+
     try {
       const response = await fetch('http://localhost:8080/api/images/apply', {
         method: 'POST',
@@ -89,17 +91,49 @@ function App() {
           'Accept': '*/*',
         },
         body: JSON.stringify(operations),
-        credentials: 'include', // Include session cookies
+        credentials: 'include',
       });
 
-        if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server responded with ${response.status}: ${errorText}`);
+      }
 
-        const result = await response.json();
-        setUploadResponse(`${result.message}. Saved as: ${result.filename}`);
+      const result = await response.json();
+      setUploadResponse(`${result.message}. Saved as: ${result.filename}`);
     } catch (error: any) {
-        setUploadResponse(`Error: ${error.message}`);
+      setUploadResponse(`Error: ${error.message}`);
     }
-};
+  };
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/images/download', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Download failed: ${response.status} ${errorText}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'processed_image.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+      console.log('Download triggered successfully.');
+    } catch (error: any) {
+      console.error('Error downloading the image:', error);
+      setUploadResponse(`Error downloading: ${error.message}`);
+    }
+  };
 
   return (
     <div className="p-6 space-y-4">
@@ -107,31 +141,76 @@ function App() {
       <input type="file" onChange={handleFileChange} />
       {imagePreview && <img src={imagePreview} alt="preview" className="max-w-xs" />}
       <button onClick={handleUpload} className="bg-green-600 text-white px-4 py-2 rounded">Upload</button>
+
       <div className="space-y-2">
         <label><input type="checkbox" checked={resize} onChange={() => setResize(!resize)} /> Resize</label>
-        {resize && (<div><input placeholder="Width" value={resizeWidth} onChange={e => setResizeWidth(e.target.value)} /> <input placeholder="Height" value={resizeHeight} onChange={e => setResizeHeight(e.target.value)} /></div>)}
+        {resize && (
+          <div>
+            <input placeholder="Width" value={resizeWidth} onChange={e => setResizeWidth(e.target.value)} />
+            <input placeholder="Height" value={resizeHeight} onChange={e => setResizeHeight(e.target.value)} />
+          </div>
+        )}
 
         <label><input type="checkbox" checked={crop} onChange={() => setCrop(!crop)} /> Crop</label>
-        {crop && (<div><input placeholder="Width" value={cropWidth} onChange={e => setCropWidth(e.target.value)} /> <input placeholder="Height" value={cropHeight} onChange={e => setCropHeight(e.target.value)} /> <input placeholder="X" value={cropX} onChange={e => setCropX(e.target.value)} /> <input placeholder="Y" value={cropY} onChange={e => setCropY(e.target.value)} /></div>)}
+        {crop && (
+          <div>
+            <input placeholder="Width" value={cropWidth} onChange={e => setCropWidth(e.target.value)} />
+            <input placeholder="Height" value={cropHeight} onChange={e => setCropHeight(e.target.value)} />
+            <input placeholder="X" value={cropX} onChange={e => setCropX(e.target.value)} />
+            <input placeholder="Y" value={cropY} onChange={e => setCropY(e.target.value)} />
+          </div>
+        )}
 
         <label><input type="checkbox" checked={rotate} onChange={() => setRotate(!rotate)} /> Rotate</label>
-        {rotate && (<div><input placeholder="Angle" value={rotateAngle} onChange={e => setRotateAngle(e.target.value)} /></div>)}
+        {rotate && (
+          <div>
+            <input placeholder="Angle" value={rotateAngle} onChange={e => setRotateAngle(e.target.value)} />
+          </div>
+        )}
 
         <label><input type="checkbox" checked={flip} onChange={() => setFlip(!flip)} /> Flip</label>
-        {flip && (<div><label><input type="checkbox" checked={flipH} onChange={() => setFlipH(!flipH)} /> Horizontal</label> <label><input type="checkbox" checked={flipV} onChange={() => setFlipV(!flipV)} /> Vertical</label></div>)}
+        {flip && (
+          <div>
+            <label><input type="checkbox" checked={flipH} onChange={() => setFlipH(!flipH)} /> Horizontal</label>
+            <label><input type="checkbox" checked={flipV} onChange={() => setFlipV(!flipV)} /> Vertical</label>
+          </div>
+        )}
 
         <label><input type="checkbox" checked={quality} onChange={() => setQuality(!quality)} /> Quality</label>
-        {quality && (<div><input placeholder="1-100" value={qualityValue} onChange={e => setQualityValue(e.target.value)} /></div>)}
+        {quality && (
+          <div>
+            <input placeholder="1-100" value={qualityValue} onChange={e => setQualityValue(e.target.value)} />
+          </div>
+        )}
 
         <label><input type="checkbox" checked={bc} onChange={() => setBc(!bc)} /> Brightness/Contrast</label>
-        {bc && (<div><input placeholder="Brightness" value={brightness} onChange={e => setBrightness(e.target.value)} /> <input placeholder="Contrast" value={contrast} onChange={e => setContrast(e.target.value)} /></div>)}
+        {bc && (
+          <div>
+            <input placeholder="Brightness" value={brightness} onChange={e => setBrightness(e.target.value)} />
+            <input placeholder="Contrast" value={contrast} onChange={e => setContrast(e.target.value)} />
+          </div>
+        )}
 
         <label><input type="checkbox" checked={format} onChange={() => setFormat(!format)} /> Format</label>
-        {format && (<div><input placeholder="png, jpg, etc." value={formatValue} onChange={e => setFormatValue(e.target.value)} /></div>)}
+        {format && (
+          <div>
+            <input placeholder="png, jpg, etc." value={formatValue} onChange={e => setFormatValue(e.target.value)} />
+          </div>
+        )}
       </div>
+
       <button onClick={handleApply} className="bg-blue-600 text-white px-4 py-2 rounded">Apply Operations</button>
+      <button onClick={handleDownload} className="bg-purple-600 text-white px-4 py-2 rounded">Download Processed Image</button>
+
       {uploadResponse && <p>{uploadResponse}</p>}
-      {processedImage && (<div><h2>Processed Image</h2><img src={processedImage} alt="processed" className="max-w-xs" /><a href={processedImage} download>Download Processed Image</a></div>)}
+
+      {processedImage && (
+        <div>
+          <h2>Processed Image</h2>
+          <img src={processedImage} alt="processed" className="max-w-xs" />
+          <a href={processedImage} download>Download Processed Image</a>
+        </div>
+      )}
     </div>
   );
 }
