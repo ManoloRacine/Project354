@@ -59,6 +59,7 @@ function App() {
       const response = await fetch('http://localhost:8080/api/images/upload', {
         method: 'POST',
         body: formData,
+        credentials: 'include', // Include session cookies
       });
       const result = await response.json();
       if (!response.ok) {
@@ -84,11 +85,12 @@ function App() {
       const response = await fetch('http://localhost:8080/api/images/apply', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'Accept': '*/*',
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
         },
         body: JSON.stringify(operations),
-    });
+        credentials: 'include', // Include session cookies
+      });
 
         if (!response.ok) throw new Error(`Server responded with ${response.status}`);
 
